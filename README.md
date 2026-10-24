@@ -69,6 +69,24 @@ docs/          Architecture, lab setup, roadmap
 - **Failed repairs need re-approval.** No silent retries.
 - **Four separate secrets** for webhook, viewer, admin, and dashboard — rejected at startup if weak or duplicated.
 
+## Verified Results (Docker Integration Test)
+
+Tested on macOS with Docker Desktop. Full incident lifecycle verified via `docker compose up` + `scripts/demo-api.sh`:
+
+- **Incident creation** — Zabbix webhook creates OPEN incident with severity, host, description
+- **Duplicate detection** — second alert for same host returns 409 Conflict
+- **Approval** — operator approves incident, status transitions to APPROVED
+- **Repair recording** — Ansible result recorded, status becomes REPAIR_RECORDED
+- **Recovery** — Zabbix OK signal resolves incident to RESOLVED with full audit trail
+- **Auth** — unauthenticated requests rejected; dashboard login enforced
+- **Stats** — `/api/v1/stats` returns correct counts per status
+- **Zabbix webhook JS** — 4/4 Node.js tests pass (PROBLEM/OK states, recovery event IDs, invalid state rejection)
+
+### Limitations
+
+- **No live Zabbix/Ansible integration.** The demo uses curl to simulate Zabbix webhooks and Ansible results. A full lab setup with real Zabbix monitoring and Ansible recovery requires a multi-VM environment (see [Lab Setup](docs/LAB_SETUP.md)).
+- **SQLite only.** Suitable for a single-campus deployment; production at scale would need PostgreSQL.
+
 ## Docs
 
 [Architecture](docs/ARCHITECTURE.md) · [Lab Setup](docs/LAB_SETUP.md) · [Test Report](docs/TEST_REPORT.md) · [Roadmap](docs/ROADMAP.md) · [Skill Mapping](docs/SKILL_MAPPING.md)
