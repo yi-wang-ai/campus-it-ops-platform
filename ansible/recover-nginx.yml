@@ -1,0 +1,26 @@
+---
+# Execute only after an incident is reviewed and approved.
+# Requires a Linux host running systemd and an operator with sudo access.
+- name: Safely restore nginx on approved lab hosts
+  hosts: webservers
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Ensure nginx is running (idempotent)
+      ansible.builtin.systemd_service:
+        name: nginx
+        state: started
+        enabled: true
+    - name: Wait until nginx listens locally
+      ansible.builtin.wait_for:
+        host: 127.0.0.1
+        port: 80
+        timeout: 30
+    - name: Confirm nginx responds successfully
+      ansible.builtin.uri:
+        url: http://127.0.0.1/
+        status_code: 200
+      register: nginx_response
+      retries: 3
+      delay: 2
+      until: nginx_response.status == 200

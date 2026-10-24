@@ -1,0 +1,14 @@
+.git
+.github
+.venv
+.env
+.pytest_cache
+.coverage
+htmlcov
+tests
+docs
+scripts
+ansible
+zabbix
+*.zip
+data

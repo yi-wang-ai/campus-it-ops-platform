@@ -1,0 +1,4 @@
+# Safe template only. Replace with YOUR private lab VM address and account.
+# Never use this reserved documentation subnet as a real SSH target.
+[webservers]
+lab-vm-01 ansible_host=192.0.2.10 ansible_user=labops
