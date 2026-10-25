@@ -20,7 +20,9 @@ Server fails → Zabbix detects it → Incident created automatically
 
 Every step is recorded. No repair runs without human approval. No incident closes until monitoring confirms the service is actually back.
 
-![Dashboard](docs/images/dashboard-local-demo.png)
+![Dashboard](docs/images/dashboard-docker-demo.jpg)
+
+![Incident detail with audit trail](docs/images/incident-detail-demo.jpg)
 
 ## Tech Stack
 
