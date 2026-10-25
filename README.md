@@ -91,6 +91,10 @@ Tested on macOS with Docker Desktop. Full incident lifecycle verified via `docke
 
 [Architecture](docs/ARCHITECTURE.md) · [Lab Setup](docs/LAB_SETUP.md) · [Test Report](docs/TEST_REPORT.md) · [Roadmap](docs/ROADMAP.md) · [Skill Mapping](docs/SKILL_MAPPING.md)
 
+## Ownership
+
+This project was designed and built by Yi Wang as a portfolio demonstration. The application code, tests, Ansible playbook, Zabbix webhook script, Docker configuration, and documentation are original work. It uses the following upstream software: FastAPI, SQLite, Zabbix (webhook integration only), and Ansible — each with their own licenses.
+
 ## License
 
 [MIT](LICENSE). Zabbix, Ansible, and FastAPI are independent projects with their own licenses.
