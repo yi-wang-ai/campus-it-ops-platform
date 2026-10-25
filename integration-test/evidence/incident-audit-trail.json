@@ -1,0 +1,36 @@
+{
+    "id": 1,
+    "source_event_id": "27",
+    "host": "lab-target",
+    "trigger_id": "25227",
+    "title": "Nginx is down on lab-target",
+    "severity": "High",
+    "status": "RESOLVED",
+    "approved_at": "2026-10-25T05:24:51.923Z",
+    "recovery_event_id": "28",
+    "resolved_at": "2026-10-25T05:25:01.455Z",
+    "created_at": "2026-10-25T05:24:51.401Z",
+    "updated_at": "2026-10-25T05:25:01.455Z",
+    "audit": [
+        {
+            "action": "PROBLEM_RECEIVED",
+            "details": "event_id=27",
+            "created_at": "2026-10-25T05:24:51.401Z"
+        },
+        {
+            "action": "REPAIR_APPROVED",
+            "details": "Human operator authorization",
+            "created_at": "2026-10-25T05:24:51.923Z"
+        },
+        {
+            "action": "REPAIR_RECORDED",
+            "details": "Ansible recover-nginx.yml via SSH to 127.0.0.1:2222",
+            "created_at": "2026-10-25T05:24:53.503Z"
+        },
+        {
+            "action": "RECOVERY_CONFIRMED",
+            "details": "event_id=28",
+            "created_at": "2026-10-25T05:25:01.455Z"
+        }
+    ]
+}

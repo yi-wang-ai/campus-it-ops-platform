@@ -1,0 +1,5 @@
+.env
+evidence/lab_key
+evidence/inventory.ini
+evidence/ansible-output.log
+evidence/integration-*.log

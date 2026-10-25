@@ -1,0 +1,48 @@
+==== 1. Waiting for services ====
+  Zabbix web API... v7.0.32
+  IT Ops API... ready
+  Target nginx... up
+
+==== 2. Configuring Zabbix (host, trigger, webhook, action) ====
+  Logged in (token=REDACTED...)
+  Host group: 22
+  Target IP: 172.26.0.2
+  Host ID: 10683
+  Item ID: 50740
+  Trigger ID: 25227
+  Media type ID: 72
+  Media type enabled with message templates
+  Action: already configured
+  Zabbix configured. Waiting 30s for initial data collection...
+
+==== 3. Stopping nginx on target (real failure) ====
+  nginx stopped. Waiting for Zabbix to detect failure (up to 90s)...
+  PASS: Zabbix detected nginx failure → incident #1 created (OPEN)
+
+==== 4. Approving repair for incident #1 ====
+  PASS: Incident approved
+
+==== 5. Running Ansible recovery playbook over SSH ====
+  PLAY [Safely restore nginx on approved lab hosts]
+  TASK [Check if systemctl exists] → ok (not found, container mode)
+  TASK [Start nginx via systemd] → skipped
+  TASK [Start nginx directly (container fallback)] → changed
+  TASK [Wait until nginx listens locally] → ok
+  TASK [Confirm nginx responds successfully] → ok (HTTP 200)
+  PLAY RECAP: lab-target ok=4 changed=1 failed=0
+  PASS: Ansible restored nginx
+
+==== 6. Recording repair result ====
+  PASS: Repair recorded
+
+==== 7. Waiting for Zabbix to confirm recovery (up to 120s) ====
+  PASS: Zabbix confirmed recovery → incident #1 RESOLVED
+
+==== 8. Full audit trail for incident #1 ====
+  See evidence/incident-audit-trail.json
+
+──────────────────────────────────────────────
+INTEGRATION TEST PASSED
+  Zabbix detected real nginx failure → webhook created incident
+  Human approved repair → Ansible restored nginx over SSH
+  Zabbix confirmed recovery → incident closed with full audit trail

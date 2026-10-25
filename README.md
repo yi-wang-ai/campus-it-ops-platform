@@ -71,22 +71,43 @@ docs/          Architecture, lab setup, roadmap
 - **Failed repairs need re-approval.** No silent retries.
 - **Four separate secrets** for webhook, viewer, admin, and dashboard — rejected at startup if weak or duplicated.
 
-## Verified Results (Docker Integration Test)
+## Verified Results
 
-Tested on macOS with Docker Desktop. Full incident lifecycle verified via `docker compose up` + `scripts/demo-api.sh`:
+### Unit Tests (30 tests, CI)
 
-- **Incident creation** — Zabbix webhook creates OPEN incident with severity, host, description
-- **Duplicate detection** — second alert for same host returns 409 Conflict
-- **Approval** — operator approves incident, status transitions to APPROVED
-- **Repair recording** — Ansible result recorded, status becomes REPAIR_RECORDED
-- **Recovery** — Zabbix OK signal resolves incident to RESOLVED with full audit trail
-- **Auth** — unauthenticated requests rejected; dashboard login enforced
-- **Stats** — `/api/v1/stats` returns correct counts per status
-- **Zabbix webhook JS** — 4/4 Node.js tests pass (PROBLEM/OK states, recovery event IDs, invalid state rejection)
+30 tests cover the full lifecycle: alert ingestion, deduplication, approval, repair, recovery, concurrency, auth, and XSS protection. CI runs on every push.
+
+### Containerized Integration Test (Zabbix + Ansible)
+
+Tested on macOS with Docker Desktop. Five containers (Zabbix server + PostgreSQL + web frontend + nginx target + IT Ops API) run the full detection-to-recovery pipeline:
+
+```
+cd integration-test && docker compose up -d --build && bash run-integration.sh
+```
+
+**Verified end-to-end pipeline:**
+
+1. Zabbix server-side simple check (`net.tcp.service[http]`) detects real nginx failure
+2. Zabbix webhook fires → IT Ops API creates incident (OPEN)
+3. Operator approves repair via API → APPROVED
+4. Ansible restores nginx over SSH (key-based auth, port 2222) → REPAIR_RECORDED
+5. Zabbix detects recovery → webhook fires OK → incident RESOLVED
+
+**Audit trail from a real run (2026-10-25):**
+
+```
+05:24:51Z  PROBLEM_RECEIVED      event_id=27
+05:24:51Z  REPAIR_APPROVED       Human operator authorization
+05:24:53Z  REPAIR_RECORDED       Ansible recover-nginx.yml via SSH to 127.0.0.1:2222
+05:25:01Z  RECOVERY_CONFIRMED    event_id=28
+```
+
+Evidence: [`integration-test/evidence/`](integration-test/evidence/)
 
 ### Limitations
 
-- **No live Zabbix/Ansible integration.** The demo uses curl to simulate Zabbix webhooks and Ansible results. A full lab with real Zabbix monitoring a target host and Ansible executing recovery playbooks can run in containers on a single machine (Zabbix server + agent container + SSH-managed target container), with the limitation that Ansible would manage a container rather than a bare-metal host. See [Lab Setup](docs/LAB_SETUP.md).
+- **Container target, not bare-metal.** Ansible manages a Docker container (no systemd — falls back to direct `nginx` command). On a real host with systemd the playbook uses `systemd_service` natively.
+- **ARM64 Mac: no Zabbix agent.** Uses server-side simple checks instead. On x86 Linux, a Zabbix agent2 on the target would provide richer metrics.
 - **SQLite only.** Suitable for a single-campus deployment; production at scale would need PostgreSQL.
 
 ## Docs

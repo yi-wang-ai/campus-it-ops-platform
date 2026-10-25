@@ -1,21 +1,37 @@
 ---
 # Execute only after an incident is reviewed and approved.
-# Requires a Linux host running systemd and an operator with sudo access.
+# Works on both systemd hosts and containers (falls back to direct nginx).
 - name: Safely restore nginx on approved lab hosts
   hosts: webservers
   become: true
   gather_facts: false
   tasks:
-    - name: Ensure nginx is running (idempotent)
+    - name: Check if systemctl exists
+      ansible.builtin.command: which systemctl
+      register: has_systemctl
+      changed_when: false
+      failed_when: false
+
+    - name: Start nginx via systemd
       ansible.builtin.systemd_service:
         name: nginx
         state: started
         enabled: true
+      when: has_systemctl.rc == 0
+
+    - name: Start nginx directly (container fallback)
+      ansible.builtin.command: nginx
+      register: nginx_start
+      changed_when: nginx_start.rc == 0
+      failed_when: false
+      when: has_systemctl.rc != 0
+
     - name: Wait until nginx listens locally
       ansible.builtin.wait_for:
         host: 127.0.0.1
         port: 80
         timeout: 30
+
     - name: Confirm nginx responds successfully
       ansible.builtin.uri:
         url: http://127.0.0.1/
