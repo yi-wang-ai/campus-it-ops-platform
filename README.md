@@ -86,7 +86,7 @@ Tested on macOS with Docker Desktop. Full incident lifecycle verified via `docke
 
 ### Limitations
 
-- **No live Zabbix/Ansible integration.** The demo uses curl to simulate Zabbix webhooks and Ansible results. A full lab setup with real Zabbix monitoring and Ansible recovery requires a multi-VM environment (see [Lab Setup](docs/LAB_SETUP.md)).
+- **No live Zabbix/Ansible integration.** The demo uses curl to simulate Zabbix webhooks and Ansible results. A full lab with real Zabbix monitoring a target host and Ansible executing recovery playbooks can run in containers on a single machine (Zabbix server + agent container + SSH-managed target container), with the limitation that Ansible would manage a container rather than a bare-metal host. See [Lab Setup](docs/LAB_SETUP.md).
 - **SQLite only.** Suitable for a single-campus deployment; production at scale would need PostgreSQL.
 
 ## Docs
